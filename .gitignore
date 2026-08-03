@@ -1,0 +1,67 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+venv/
+env/
+.env
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+*.whl
+
+# PyTorch / model checkpoints
+*.pt
+*.pth
+*.bin
+*.safetensors
+*.gguf
+checkpoints/
+outputs/
+*.onnx
+
+# Data files (large)
+*.parquet
+*.arrow
+
+# IDE / Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+wandb/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Kilo config
+.kilo/
+
+# Test/checkpoint directories
+testm/
+session
+SESSION.md
+
+# Coverage
+.coverage
+htmlcov/
+.coverage.*
+pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Temporary files
+*.tmp
+*.temp
