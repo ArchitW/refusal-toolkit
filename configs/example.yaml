@@ -1,0 +1,9 @@
+model: meta-llama/Meta-Llama-3-8B-Instruct
+measurements: outputs/llama3-8b-measurements.pt
+output: outputs/llama3-8b-abliterated
+source_layer: 22
+target_layers: null
+scale: 1.0
+projected: true
+norm_preserve: true
+mode: permanent
