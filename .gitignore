@@ -65,3 +65,5 @@ pytest_cache/
 # Temporary files
 *.tmp
 *.temp
+
+AGENTS.md
