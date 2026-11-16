@@ -122,6 +122,43 @@ def main():
     p_sae.add_argument("--eval-output")
     p_sae.add_argument("--gguf-file")
 
+    # heretic-search (advanced: Optuna TPE search with KL cap)
+    p_search = subparsers.add_parser(
+        "heretic-search",
+        help="Heretic-style Optuna TPE search for ablation hyperparameters "
+             "(arXiv:2611.17846)",
+    )
+    p_search.add_argument("--model", "-m", required=True)
+    p_search.add_argument("--measurements", required=True)
+    p_search.add_argument("--per-prompt-measurements", "-p",
+                          help="Required for som/ara methods")
+    p_search.add_argument("--output", "-o", required=True,
+                          help="Output directory for the best model")
+    p_search.add_argument("--method",
+                          choices=["dim", "mpoa", "som", "ara", "jspace"],
+                          default="mpoa")
+    p_search.add_argument("--n-trials", type=int, default=100)
+    p_search.add_argument("--kl-cap", type=float, default=0.1,
+                          help="First-token KL divergence cap")
+    p_search.add_argument("--dev-prompts", default="data/harmful.txt")
+    p_search.add_argument("--max-samples", type=int, default=64)
+    p_search.add_argument("--seed", type=int, default=1)
+    p_search.add_argument("--quant", choices=["4bit", "8bit"])
+
+    # evaluate-capability
+    p_cap = subparsers.add_parser(
+        "evaluate-capability",
+        help="Run capability benchmarks (MMLU, HellaSwag, IFEval, HumanEval)",
+    )
+    p_cap.add_argument("--model", "-m", required=True)
+    p_cap.add_argument("--benchmarks", nargs="+",
+                       choices=["mmlu", "hellaswag", "ifeval", "humaneval"],
+                       default=["mmlu", "hellaswag"])
+    p_cap.add_argument("--n-samples", type=int,
+                       help="Limit samples per benchmark")
+    p_cap.add_argument("--output", "-o")
+    p_cap.add_argument("--batch-size", default="auto")
+
     args = parser.parse_args()
 
     # Dispatch to appropriate script
@@ -134,6 +171,8 @@ def main():
         "harmfulness-guard": "06_harmfulness_guard.py",
         "codeql-verify": "07_codeql_verify.py",
         "sae": "08_sae_refusal.py",
+        "heretic-search": "10_heretic_search.py",
+        "evaluate-capability": "11_evaluate_capability.py",
     }
 
     script_file = script_map.get(args.command)

@@ -142,3 +142,66 @@ def compute_contrast_outliers(
 
     outlier_mask = norms > (mean_norm + threshold_std * std_norm)
     return torch.where(outlier_mask)[0].tolist()
+
+
+# =============================================================================
+# SOM (Self-Organising Map) directions
+# =============================================================================
+#
+# Piras et al. (2025): a 1-D SOM over per-prompt harmful activations yields k
+# prototype "neurons" per layer. The k codebook vectors closest to the class
+# mean are orthonormalised and returned as directions, scaled by a geometric
+# decay (direction i gets weight decay^i). Heretic's port uses k=4.
+
+def som_directions(
+    per_prompt_measurements: Dict,
+    layer_idx: int,
+    k: int = 4,
+    n_neurons: int = 16,
+    epochs: int = 50,
+    decay: float = 0.7,
+    lr0: float = 0.5,
+) -> torch.Tensor:
+    """Train a 1-D SOM on harmful per-prompt activations and return k unit
+    directions (top-k codebook vectors closest to the class mean, scaled by
+    geometric decay and re-normalised)."""
+    harmful_key = f"harmful_per_prompt_{layer_idx}"
+    if harmful_key not in per_prompt_measurements:
+        raise ValueError(f"Per-prompt harmful activations not found for layer {layer_idx}")
+
+    X = per_prompt_measurements[harmful_key].float()
+    n, d = X.shape
+
+    # Initialise codebook from random samples.
+    idx = torch.randperm(n, device=X.device)[:n_neurons]
+    codebook = X[idx].clone().float()
+
+    positions = torch.arange(n_neurons, device=X.device, dtype=torch.float32)
+    sigma0 = n_neurons / 2.0
+
+    for epoch in range(epochs):
+        lr = lr0 * (1.0 - epoch / epochs)
+        sigma = sigma0 * (1.0 - epoch / epochs)
+        perm = torch.randperm(n, device=X.device)
+        for i in perm:
+            x = X[i]
+            dists = torch.norm(codebook - x, dim=1)
+            bmu = int(torch.argmin(dists))
+            h = torch.exp(-0.5 * ((positions - bmu) / sigma) ** 2).unsqueeze(1)
+            codebook.data += lr * h * (x - codebook)
+
+    # Top-k codebook vectors closest to the class mean.
+    mean_act = X.mean(0)
+    dists = torch.norm(codebook - mean_act, dim=1)
+    top_idx = torch.argsort(dists)[:k]
+    dirs = codebook[top_idx]
+
+    # Orthonormalise via QR.
+    Q, _ = torch.linalg.qr(dirs.T)  # (d, k)
+    dirs = Q.T  # (k, d)
+
+    # Geometric decay then re-normalise.
+    scales = torch.tensor([decay ** i for i in range(k)],
+                          device=dirs.device, dtype=dirs.dtype).unsqueeze(1)
+    dirs = dirs * scales
+    return normalize_direction(dirs)

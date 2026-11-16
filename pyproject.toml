@@ -34,6 +34,7 @@ dependencies = [
     "pandas>=2.0.0",
     "pyarrow>=15.0.0",
     "safetensors>=0.4.0",
+    "optuna>=3.4.0",
 ]
 optional-dependencies = {
     "dev" = [
@@ -48,6 +49,12 @@ optional-dependencies = {
     ],
     "sae" = [
         "wandb>=0.16.0",
+    ],
+    "benchmarks" = [
+        "lm-eval>=0.4.0",
+    ],
+    "judge" = [
+        "openai>=1.0.0",
     ],
 }
 

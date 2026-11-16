@@ -268,6 +268,26 @@ python scripts/04_evaluate.py \
 
 ### 5. Advanced Workflows
 
+**Heretic-style search** (Optuna TPE with KL cap, arXiv:2611.17846):
+```bash
+refusal-toolkit heretic-search \
+    -m Qwen/Qwen2.5-7B-Instruct \
+    --measurements outputs/qwen-measurements.pt \
+    --per-prompt-measurements outputs/qwen-per-prompt.pt \
+    --method mpoa \
+    --n-trials 100 \
+    --kl-cap 0.1 \
+    --output outputs/qwen-heretic-best
+```
+
+**Capability benchmarks** (MMLU, HellaSwag, IFEval, HumanEval):
+```bash
+refusal-toolkit evaluate-capability \
+    -m outputs/qwen-abliterated \
+    --benchmarks mmlu hellaswag \
+    --output outputs/qwen-capability.json
+```
+
 **Cross-lingual transfer** (Wang et al. 2025):
 
 ```bash
@@ -498,6 +518,55 @@ python scripts/01_measure.py \
     --harmless data/my_harmless.txt \
     -o outputs/custom-measurements.pt
 ```
+
+---
+
+## Advanced Methods (arXiv:2611.17846)
+
+This toolkit implements the five refusal-removal methods evaluated in
+*"Is Abliteration Getting Harder? Not Uniformly"* (Young 2026, arXiv:2611.17846):
+
+| Method | Assumption | Edit | Rank | Search |
+|--------|------------|------|------|--------|
+| `dim` | 1 direction | rank-1 projection | 1 | TPE |
+| `mpoa` | 1 direction, ⟂ harmless | rank-1 + norm restore | 3 | TPE |
+| `som` | k cluster directions | rank-k + norm restore | 6 | TPE |
+| `ara` | none (per-module map) | rank-50 LoRA | 50 | TPE + L-BFGS |
+| `jspace` | 1 direction in J-space | rank-1 + norm restore | 3 | TPE |
+
+All methods run inside a Heretic-style Optuna TPE search (100 trials,
+first-token KL ≤ 0.1 cap, dev-set keyword refusal objective). The best
+trial is exported as a standalone model.
+
+### Quick comparison
+
+```bash
+# Apply a single method directly (no search)
+refusal-toolkit abliterate -m Qwen/Qwen2.5-7B-Instruct \
+    --measurements outputs/qwen-measurements.pt \
+    --source-layer 14 \
+    --scale 1.0 \
+    --output outputs/qwen-ablated
+
+# Run the full Heretic-style search for a specific method
+refusal-toolkit heretic-search \
+    -m Qwen/Qwen2.5-7B-Instruct \
+    --measurements outputs/qwen-measurements.pt \
+    --per-prompt-measurements outputs/qwen-per-prompt.pt \
+    --method ara \
+    --n-trials 100 \
+    --kl-cap 0.1 \
+    --output outputs/qwen-ara-best
+```
+
+### Model pairs (configs/model_pairs.yaml)
+
+The toolkit ships with configs for the 5 release pairs from the paper:
+- **Qwen**: Qwen2.5-32B → Qwen3.8-27B
+- **Gemma**: Gemma-2-27B → Gemma-4-31B
+- **OLMo**: OLMo-2-32B → OLMo-3.1-32B
+- **Mistral Small**: Mistral-Small-2409 → Mistral-Small-3.2
+- **Qwen small**: Qwen2.5-7B → Qwen3.5-4B (adds J-space)
 
 ---
 

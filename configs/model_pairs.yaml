@@ -1,0 +1,90 @@
+# Model configurations for the 5 release pairs from arXiv:2611.17846
+# "Is Abliteration Getting Harder? Not Uniformly"
+#
+# Each pair defines an earlier and later release of the same model family,
+# plus the ablation method to use and the dev/harmless prompt sets.
+
+# =============================================================================
+# Qwen pair (main study, 32B vs 27B)
+# =============================================================================
+qwen:
+  earlier:
+    model: Qwen/Qwen2.5-32B-Instruct
+    size_gb: 65.5
+    layers: 64
+    released: "2024-09"
+  later:
+    model: Qwen/Qwen3.8-27B
+    size_gb: 55.6
+    layers: 64
+    released: "2026-08"
+    notes: "hybrid linear/full attention; image-text"
+  methods: [dim, mpoa, som, ara]
+  small_pair_methods: []  # J-space not applicable to main pair
+
+# =============================================================================
+# Gemma pair (main study, 27B vs 31B)
+# =============================================================================
+gemma:
+  earlier:
+    model: google/gemma-2-27b-it
+    size_gb: 54.5
+    layers: 46
+    released: "2024-06"
+    notes: "post-norm; no system role"
+  later:
+    model: google/gemma-4-31B-it
+    size_gb: 62.6
+    layers: 60
+    released: "2026-04"
+    notes: "post-norm; image-text"
+  methods: [dim, mpoa, som, ara]
+
+# =============================================================================
+# OLMo pair (main study, 32B vs 32B)
+# =============================================================================
+olmo:
+  earlier:
+    model: allenai/OLMo-2-0325-32B-Instruct
+    size_gb: 64.5
+    layers: 64
+    released: "2025-03"
+    notes: "post-norm"
+  later:
+    model: allenai/OLMo-3.1-32B-Instruct
+    size_gb: 64.5
+    layers: 64
+    released: "2026-01"
+  methods: [dim, mpoa, som, ara]
+
+# =============================================================================
+# Mistral Small pair (main study)
+# =============================================================================
+mistral:
+  earlier:
+    model: mistralai/Mistral-Small-Instruct-2409
+    size_gb: 47.0
+    layers: 40
+    released: "2024-09"
+  later:
+    model: mistralai/Mistral-Small-3.2-Instruct
+    size_gb: 47.0
+    layers: 40
+    released: "2026-02"
+  methods: [dim, mpoa, som, ara]
+
+# =============================================================================
+# Small Qwen pair (7B vs 4B, adds J-space)
+# =============================================================================
+qwen_small:
+  earlier:
+    model: Qwen/Qwen2.5-7B-Instruct
+    size_gb: 15.2
+    layers: 28
+    released: "2024-09"
+  later:
+    model: Qwen/Qwen3.5-4B-Instruct
+    size_gb: 8.2
+    layers: 32
+    released: "2026-05"
+  methods: [dim, mpoa, som, ara, jspace]

@@ -41,6 +41,26 @@ from .ablate import (
     leace_direction,
     build_directions,
     ablate_model_weights,
+    # LoRA-based methods (Heretic 2.0 style)
+    LoRAAdapter,
+    attach_lora_to_module,
+    apply_lora_adapters,
+    merge_lora_adapters,
+    make_ablation_lora_init,
+    # MPOA
+    apply_mpoa,
+    # SOM
+    SelfOrganizingMap,
+    som_directions,
+    apply_som,
+    # ARA
+    ara_objective,
+    apply_ara,
+    # J-space
+    jacobian_lens_direction,
+    apply_jspace,
+    # Unified dispatcher
+    apply_method,
 )
 from .evaluate import (
     is_refusal,
@@ -49,7 +69,12 @@ from .evaluate import (
     detect_harmfulness_latent,
     detect_reasoning_tags,
     split_reasoning_output,
+    # WildGuard judge
+    wildguard_judge_local,
+    wildguard_judge_api,
+    evaluate_with_wildguard,
 )
+from .capability import evaluate_capability
 from .utils import (
     load_prompts,
     format_chat_prompts,
@@ -100,6 +125,20 @@ __all__ = [
     "leace_direction",
     "build_directions",
     "ablate_model_weights",
+    "LoRAAdapter",
+    "attach_lora_to_module",
+    "apply_lora_adapters",
+    "merge_lora_adapters",
+    "make_ablation_lora_init",
+    "apply_mpoa",
+    "SelfOrganizingMap",
+    "som_directions",
+    "apply_som",
+    "ara_objective",
+    "apply_ara",
+    "jacobian_lens_direction",
+    "apply_jspace",
+    "apply_method",
     # evaluate
     "is_refusal",
     "evaluate_refusal_rate",
@@ -107,6 +146,11 @@ __all__ = [
     "detect_harmfulness_latent",
     "detect_reasoning_tags",
     "split_reasoning_output",
+    "wildguard_judge_local",
+    "wildguard_judge_api",
+    "evaluate_with_wildguard",
+    # capability
+    "evaluate_capability",
     # utils
     "load_prompts",
     "format_chat_prompts",
