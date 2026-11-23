@@ -69,6 +69,11 @@ from .evaluate import (
     detect_harmfulness_latent,
     detect_reasoning_tags,
     split_reasoning_output,
+    # Paper 07 — Don't Say No (DSN)
+    get_refusal_token_ids,
+    dsn_cosine_decay,
+    compute_dsn_loss,
+    compute_refusal_token_logprob,
     # WildGuard judge
     wildguard_judge_local,
     wildguard_judge_api,
@@ -146,6 +151,10 @@ __all__ = [
     "detect_harmfulness_latent",
     "detect_reasoning_tags",
     "split_reasoning_output",
+    "get_refusal_token_ids",
+    "dsn_cosine_decay",
+    "compute_dsn_loss",
+    "compute_refusal_token_logprob",
     "wildguard_judge_local",
     "wildguard_judge_api",
     "evaluate_with_wildguard",

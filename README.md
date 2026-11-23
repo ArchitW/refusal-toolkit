@@ -117,7 +117,10 @@ refusal-toolkit/
 │   ├── 05_cross_lingual.py       # Cross-lingual direction transfer
 │   ├── 06_harmfulness_guard.py   # Post-ablation latent guard
 │   ├── 07_codeql_verify.py       # CodeQL static analysis for CWEs
-│   └── 08_sae_refusal.py         # SAE-based refusal feature extraction
+│   ├── 08_sae_refusal.py         # SAE-based refusal feature extraction
+│   ├── 09_dsn.py                 # Token-level refusal log-prob judge (Don't Say No)
+│   ├── 10_heretic_search.py      # Heretic-style Optuna TPE search
+│   └── 11_evaluate_capability.py # Capability benchmark suite
 ├── data/
 │   ├── harmful.txt               # 172 diverse harmful prompts
 │   ├── harmless.txt              # 365 diverse benign prompts
@@ -181,7 +184,8 @@ All subcommands:
 refusal-toolkit measure -m Qwen/Qwen2.5-1.5B-Instruct -o outputs/qwen-measurements.pt --quant 4bit
 refusal-toolkit analyze outputs/qwen-measurements.pt --output-json outputs/qwen-analysis.json
 refusal-toolkit abliterate -m Qwen/Qwen2.5-1.5B-Instruct --measurements outputs/qwen-measurements.pt --projected --norm-preserve --output outputs/qwen-abliterated
-refusal-toolkit evaluate -m outputs/qwen-abliterated --harmful data/harmful.txt --harmless data/harmless.txt
+refusal-toolkit evaluate -m outputs/qwen-abliterated --harmful data/harmful.txt --harmless data/harmless.txt --judge hybrid
+refusal-toolkit dsn -m Qwen/Qwen2.5-1.5B-Instruct --harmful data/harmful.txt --harmless data/harmless.txt --judge hybrid
 refusal-toolkit cross-lingual -m your-model --measurements outputs/english-measurements.pt --target-lang-harmful data/multilingual-harmful.txt --target-lang-harmless data/multilingual-harmless.txt
 refusal-toolkit harmfulness-guard -m your-model --measurements outputs/measures.pt --prompt "How do I pick a lock?"
 refusal-toolkit codeql-verify -m your-code-llm --prompts data/cwe-harmful.txt --language python
@@ -386,6 +390,23 @@ python scripts/08_sae_refusal.py \
 | `-m, --model` | Model to evaluate | **required** |
 | `--harmful` | Harmful test prompts | None |
 | `--harmless` | Harmless test prompts | None |
+| `--output` | Write JSON results | None |
+| `--judge` | Refusal judge: `regex`, `logprob`, `hybrid` | `regex` |
+| `--refusal-threshold` | Probability threshold for `logprob` judge | `0.5` |
+| `--repetition-penalty` | Greedy decoding repetition penalty | `1.0` |
+
+#### `09_dsn.py` (Paper 07 — Don't Say No)
+
+| Flag | Description | Default |
+|------|-------------|---------|
+| `-m, --model` | HF model ID or path | **required** |
+| `--harmful` | Harmful prompts file | `data/harmful.txt` |
+| `--harmless` | Harmless prompts file | `data/harmless.txt` |
+| `--max-samples` | Max prompts per split | `64` |
+| `--batch-size` | Batch size | `8` |
+| `--max-new-tokens` | Max generation tokens | `128` |
+| `--judge` | Judge mode: `logprob`, `regex`, `hybrid` | `hybrid` |
+| `--refusal-threshold` | Refusal probability threshold | `0.5` |
 | `--output` | Write JSON results | None |
 
 #### `05_cross_lingual.py`

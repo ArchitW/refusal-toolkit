@@ -68,7 +68,28 @@ def main():
     p_eval.add_argument("--harmful")
     p_eval.add_argument("--harmless")
     p_eval.add_argument("--output")
+    p_eval.add_argument("--judge", choices=["regex", "logprob", "hybrid"], default="regex",
+                        help="Refusal judge mode (Paper 07)")
+    p_eval.add_argument("--refusal-threshold", type=float, default=0.5,
+                        help="Refusal probability threshold for logprob judge")
     p_eval.add_argument("--repetition-penalty", type=float, default=1.0)
+
+    # dsn (Paper 07: Don't Say No)
+    p_dsn = subparsers.add_parser(
+        "dsn",
+        help="Don't Say No (arXiv:2404.16369): Token-level refusal log-prob evaluation",
+    )
+    p_dsn.add_argument("--model", "-m", required=True)
+    p_dsn.add_argument("--harmful", default="data/harmful.txt")
+    p_dsn.add_argument("--harmless", default="data/harmless.txt")
+    p_dsn.add_argument("--max-samples", type=int, default=64)
+    p_dsn.add_argument("--batch-size", type=int, default=8)
+    p_dsn.add_argument("--max-new-tokens", type=int, default=128)
+    p_dsn.add_argument("--judge", choices=["logprob", "regex", "hybrid"], default="hybrid")
+    p_dsn.add_argument("--refusal-threshold", type=float, default=0.5)
+    p_dsn.add_argument("--repetition-penalty", type=float, default=1.0)
+    p_dsn.add_argument("--gguf-file")
+    p_dsn.add_argument("--output", "-o")
 
     # cross-lingual
     p_cross = subparsers.add_parser("cross-lingual", help="Cross-lingual direction transfer")
@@ -141,6 +162,10 @@ def main():
     p_search.add_argument("--kl-cap", type=float, default=0.1,
                           help="First-token KL divergence cap")
     p_search.add_argument("--dev-prompts", default="data/harmful.txt")
+    p_search.add_argument("--judge", choices=["regex", "logprob", "hybrid"], default="regex",
+                          help="Refusal judge mode (Paper 07)")
+    p_search.add_argument("--refusal-threshold", type=float, default=0.5,
+                          help="Refusal probability threshold for logprob judge")
     p_search.add_argument("--max-samples", type=int, default=64)
     p_search.add_argument("--seed", type=int, default=1)
     p_search.add_argument("--quant", choices=["4bit", "8bit"])
@@ -171,6 +196,7 @@ def main():
         "harmfulness-guard": "06_harmfulness_guard.py",
         "codeql-verify": "07_codeql_verify.py",
         "sae": "08_sae_refusal.py",
+        "dsn": "09_dsn.py",
         "heretic-search": "10_heretic_search.py",
         "evaluate-capability": "11_evaluate_capability.py",
     }
