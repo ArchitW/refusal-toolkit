@@ -1,4 +1,4 @@
-# 12 — Safe-Role Internalization (SSRFT): Robust and Generalizable Safety Alignment
+# 13 — Safe-Role Internalization (SSRFT): Robust and Generalizable Safety Alignment
 
 **Authors:** Jinghao Pang, Jitai Hao, Qiang Huang, Zhaochun Ren, Jun Yu
 **Year:** 2026 (Oct 2026)

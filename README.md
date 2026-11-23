@@ -105,8 +105,8 @@ refusal-toolkit/
 │   ├── measure_per_prompt.py     # Per-prompt activation collection
 │   ├── directions.py             # Direction extraction & refinement (SVD, PCA, SAE)
 │   ├── ablate.py                 # Hook-based & permanent weight ablation
-│   ├── evaluate.py               # Refusal judge, capability checks, latent guard
-│   ├── code_validate.py          # Syntax validation for code LLMs
+│   ├── evaluate.py               # Refusal judge (regex, DSN log-prob, WildGuard), latent guard
+│   ├── capability.py             # MMLU, HellaSwag, IFEval, HumanEval benchmarks
 │   ├── sae_extract.py            # Sparse Autoencoder training & feature extraction
 │   └── utils.py                  # Data loading, formatting, I/O
 ├── scripts/
@@ -593,31 +593,68 @@ The toolkit ships with configs for the 5 release pairs from the paper:
 
 ## Attribution & References
 
-### Core Research
+### Core Research & `research/` Archive
 
-1. **Arditi, A., Obeso, A., Syed, A., Paleka, D., Nitishinskaya, M., & Nanda, N. (2024).**
-   *Refusal in LLMs is Mediated by a Single Direction.*
-   [Alignment Forum](https://www.alignmentforum.org/posts/jGuXSZgv6qfdhMCuJ/refusal-in-llms-is-mediated-by-a-single-direction)
+1. **Arditi, A., Obeso, O., Syed, A., Paleka, D., Panickssery, N., Gurnee, W., & Nanda, N. (2024).**
+   *Refusal in Language Models Is Mediated by a Single Direction.* [arXiv:2406.11717](https://arxiv.org/abs/2406.11717) · [`research/01`](research/01_single_direction_mediation.md)
 
-2. **Liguori, M., et al. (2025).**
-   *Refusal in Code LLMs.*
-   [Hugging Face Blog](https://huggingface.co/blog/monsoon-nlp/refusal-in-code-llms)
+2. **Cui, J., Chiang, W.-L., Stoica, I., & Hsieh, C.-J. (2025).**
+   *OR-Bench: An Over-Refusal Benchmark for Large Language Models.* ICML 2025. [arXiv:2405.20947](https://arxiv.org/abs/2405.20947) · [`research/02`](research/02_or_bench_over_refusal.md)
 
-3. **Wang, Y., et al. (2025).**
-   *The Refusal Direction is Universal.*
-   [arXiv:2506.16754](https://arxiv.org/abs/2506.16754)
+3. **Hildebrandt, F., Maier, A., Krauss, P., & Schilling, A. (2025).**
+   *Refusal Behavior in Large Language Models: A Nonlinear Perspective.* [arXiv:2501.08145](https://arxiv.org/abs/2501.08145) · [`research/03`](research/03_nonlinear_refusal.md)
 
-4. **Zhao, J., et al. (2025).**
-   *LLMs Encode Harmfulness and Refusal in Separable Subspaces.*
-   [arXiv:2506.16728](https://arxiv.org/abs/2506.16728)
+4. **Wollschläger, T., Elstner, J., Geisler, S., Cohen-Addad, V., Günnemann, S., & Gasteiger, J. (2025).**
+   *The Geometry of Refusal in Large Language Models: Concept Cones and Representational Independence.* ICML 2025. [arXiv:2502.17420](https://arxiv.org/abs/2502.17420) · [`research/04`](research/04_geometry_of_refusal_concept_cones.md)
 
-5. **"Willing but Unable" (2025).**
-   *Abliteration Requires Multiple Directions.*
-   [arXiv:2507.04550](https://arxiv.org/abs/2507.04550)
+5. **Zou, A., Wang, Z., Carlini, N., Nasr, M., Kolter, J. Z., & Fredrikson, M. (2023).**
+   *Universal and Transferable Adversarial Attacks on Aligned Language Models (GCG).* [arXiv:2307.15043](https://arxiv.org/abs/2307.15043) · [`research/06`](research/06_gcg_adversarial_attacks.md)
 
-6. **Hawasly, A., et al. (2026).**
-   *Sparse Autoencoders for Refusal Direction Extraction.*
-   [arXiv:2507.02646](https://arxiv.org/abs/2507.02646)
+6. **Zhou, Y., Lou, J., Huang, Z., Qin, Z., Yang, Y., & Wang, W. (2025).**
+   *Don't Say No: Jailbreaking LLM by Suppressing Refusal (DSN).* Findings of ACL 2025. [arXiv:2404.16369](https://arxiv.org/abs/2404.16369) · [`research/07`](research/07_dont_say_no_dsn.md) · `scripts/09_dsn.py`
+
+7. **Zou, A., Phan, L., Wang, J., Duenas, D., Lin, M., Andriushchenko, M., Wang, R., Kolter, Z., Fredrikson, M., & Hendrycks, D. (2024).**
+   *Improving Alignment and Robustness with Circuit Breakers.* [arXiv:2406.04313](https://arxiv.org/abs/2406.04313) · [`research/11`](research/11_circuit_breakers.md)
+
+8. **Wang, Y., et al. (2025).**
+   *The Refusal Direction is Universal.* [arXiv:2506.16754](https://arxiv.org/abs/2506.16754) · `scripts/05_cross_lingual.py`
+
+9. **Zhao, J., et al. (2025).**
+   *LLMs Encode Harmfulness and Refusal in Separable Subspaces.* [arXiv:2506.16728](https://arxiv.org/abs/2506.16728) · `scripts/06_harmfulness_guard.py`
+
+10. **"Willing but Unable" / Piras et al. (2025).**
+    *Abliteration Requires Multiple Directions (SOMs Generalize Difference-in-Means).* [arXiv:2507.04550](https://arxiv.org/abs/2507.04550) · `src/ablate.py::apply_som`
+
+11. **Hawasly, A., et al. (2026).**
+    *Sparse Autoencoders for Refusal Direction Extraction.* [arXiv:2507.02646](https://arxiv.org/abs/2507.02646) · `src/sae_extract.py`, `scripts/08_sae_refusal.py`
+
+12. **Liguori, M., et al. (2025).**
+    *Refusal in Code LLMs.* [Hugging Face Blog](https://huggingface.co/blog/monsoon-nlp/refusal-in-code-llms) · `scripts/07_codeql_verify.py`
+
+13. **Guo, Y., Xu, Z., Liu, S., Zheng, Z., & Kankanhalli, M. (2026).**
+    *LLMs Can Unlearn Refusal with Only 1,000 Benign Samples.* [arXiv:2601.19231](https://arxiv.org/abs/2601.19231) · [`research/08`](research/08_refusal_unlearning_1000_samples.md)
+
+14. **Park, K., & Kim, T. (2026).**
+    *Inference-Time Vulnerability Beyond Shallow Safety: Alignment Along Generation Trajectories.* [arXiv:2606.04778](https://arxiv.org/abs/2606.04778) · [`research/09`](research/09_inference_time_trajectory_vulnerability.md) · [`research/12`](research/12_alignment_generation_trajectories.md)
+
+15. **Liu, J., Wang, H., Luo, W., & Jia, X. (2027).**
+    *Beyond the Prompt: Jailbreaking Function-Calling LLMs via Simulated Moderation Traces.* IEEE S&P 2027. [arXiv:2607.00481](https://arxiv.org/abs/2607.00481) · [`research/10`](research/10_smt_function_calling_jailbreak.md)
+
+16. **Pang, J., Hao, J., Huang, Q., Ren, Z., & Yu, J. (2026).**
+    *Beyond Refusal Patterns: Safe-Role Internalization for Robust and Generalizable LLM Safety Alignment.* [arXiv:2610.07023](https://arxiv.org/abs/2610.07023) · [`research/13`](research/13_safe_role_internalization.md)
+
+17. **Zhao, W., Ben-Levi, D., Peng, J., Yu, Z., & Yang, J. (2026).**
+    *Jailbreaking Jailbreaks: A Proactive Defense for LLMs (ProAct).* Findings of EMNLP 2026. [ACL Anthology](https://aclanthology.org/2026.findings-emnlp.516/) · [`research/14`](research/14_proact_jailbreaking_jailbreaks.md)
+
+18. **Pattison, C., Manuali, L., & Lazar, S. (2026).**
+    *Blind Refusal: Language Models Refuse to Help Users Evade Unjust, Absurd, and Illegitimate Rules.* [arXiv:2604.06233](https://arxiv.org/abs/2604.06233) · [`research/05`](research/05_blind_refusal.md)
+
+19. **Young (2026).**
+    *Is Abliteration Getting Harder? Not Uniformly (Heretic 2.0).* [arXiv:2611.17846](https://arxiv.org/abs/2611.17846) · `scripts/10_heretic_search.py`, `scripts/11_evaluate_capability.py`
+
+20. **Han, S., et al. (2024) & Belrose et al. (2024).**
+    - *WildGuard: Open One-stop Moderation Tools for Safety Risks, Jailbreaks, and Refusals of LLMs.* [arXiv:2406.08495](https://arxiv.org/abs/2406.08495) (`src/evaluate.py`)
+    - *LEACE: Perfect Linear Concept Erasure in Closed Form.* [arXiv:2306.03819](https://arxiv.org/abs/2306.03819) (`src/ablate.py::leace_direction`)
 
 ### Implementation Lineage
 
@@ -702,7 +739,7 @@ After ablation, models may exhibit degraded capabilities (over-compliance, reduc
 | `--projected` | Gram-Schmidt against harmless mean; preserves benign behavior |
 | `--norm-preserve` | Maintains weight row norms; keeps model coherent |
 | `--mode hook` | Reversible inference-time hooks; no weight changes |
-| SVD/PCA (`11_ablate_all.py`) | Top-k directions for nuanced control |
+| SVD/PCA/SOM (`src/ablate.py::build_directions`) | Top-k directions (`svd`, `whitened-svd`, `som`, `leace`) for nuanced control |
 | SAE feature ablation | Granular per-feature removal |
 
 ### Additional Recovery (External)
