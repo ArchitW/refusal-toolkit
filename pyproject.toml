@@ -56,6 +56,9 @@ optional-dependencies = {
     "judge" = [
         "openai>=1.0.0",
     ],
+    "tui" = [
+        "textual>=0.60.0",
+    ],
 }
 
 [project.scripts]

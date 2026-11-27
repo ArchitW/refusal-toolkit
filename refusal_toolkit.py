@@ -170,6 +170,12 @@ def main():
     p_search.add_argument("--seed", type=int, default=1)
     p_search.add_argument("--quant", choices=["4bit", "8bit"])
 
+    # tui
+    subparsers.add_parser(
+        "tui",
+        help="Launch the interactive Textual TUI (requires the 'tui' extra)",
+    )
+
     # evaluate-capability
     p_cap = subparsers.add_parser(
         "evaluate-capability",
@@ -185,6 +191,10 @@ def main():
     p_cap.add_argument("--batch-size", default="auto")
 
     args = parser.parse_args()
+
+    if args.command == "tui":
+        from src.tui.app import run
+        sys.exit(run())
 
     # Dispatch to appropriate script
     script_map = {
