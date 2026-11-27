@@ -104,6 +104,10 @@ def main():
                         help="First-token KL divergence cap")
     parser.add_argument("--dev-prompts", default="data/harmful.txt",
                         help="Dev-set harmful prompts for keyword refusal")
+    parser.add_argument("--judge", choices=["regex", "logprob", "hybrid"], default="regex",
+                        help="Refusal judge mode (Paper 07: logprob/hybrid)")
+    parser.add_argument("--refusal-threshold", type=float, default=0.5,
+                        help="Refusal probability threshold for logprob judge")
     parser.add_argument("--max-samples", type=int, default=64,
                         help="Max dev prompts")
     parser.add_argument("--seed", type=int, default=1,
@@ -184,7 +188,8 @@ def main():
 
         # Evaluate dev-set refusal rate.
         refusal_result = evaluate_refusal_rate(
-            trial_model, tokenizer, dev_prompts, max_new_tokens=128
+            trial_model, tokenizer, dev_prompts, max_new_tokens=128,
+            judge=args.judge, refusal_threshold=args.refusal_threshold,
         )
         refusal_rate = refusal_result["refusal_rate"]
 
@@ -196,7 +201,7 @@ def main():
         objective = refusal_rate + penalty
 
         print(f"  Trial {trial.number}: layer={layer}, strength={strength:.1f}, "
-              f"refusal={refusal_rate:.2%}, KL={kl:.4f}, obj={objective:.4f}")
+              f"refusal={refusal_rate:.2%} ({args.judge}), KL={kl:.4f}, obj={objective:.4f}")
 
         # Clean up.
         del trial_model

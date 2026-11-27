@@ -1,14 +1,8 @@
 # Research — Refusal, Ablation, Jailbreaks & Defenses
 
-Research notes on the 14 methods in [`todo.md`](../todo.md). **This is a research
-archive, not code.** Each file is a self-contained note: core claim, mechanism, key
-findings, relationship to the literature, relevance to `refusal-toolkit`, and open
-questions.
+Research notes on refusal, abliteration, jailbreaks, and representation-level defenses, cross-referenced with the modules and scripts in `refusal-toolkit`. Each note is a self-contained summary: core claim, mechanism, key findings, relationship to the literature, relevance to `refusal-toolkit`, and open questions.
 
-> **Scope note.** These notes are based on the papers' abstracts and public
-> descriptions (arXiv, ACL Anthology, PMLR). They are *not* a substitute for reading
-> the full PDFs, which should be consulted before relying on any specific number or
-> algorithmic detail.
+> **Scope note.** These notes are based on the papers' abstracts and public descriptions (arXiv, ACL Anthology, PMLR). They are *not* a substitute for reading the full PDFs, which should be consulted before relying on any specific number or algorithmic detail.
 
 ---
 
@@ -42,6 +36,19 @@ questions.
 | 12 | [Alignment Along Generation Trajectories (defense)](https://arxiv.org/abs/2606.04778) | 2026 | Train on perturbed decoding trajectories, not just outputs. | [`12_alignment_generation_trajectories.md`](12_alignment_generation_trajectories.md) |
 | 13 | [Safe-Role Internalization (SSRFT)](https://arxiv.org/abs/2610.07023) | 2026 | Train a "safe role" instead of refusal templates; less over-refusal. | [`13_safe_role_internalization.md`](13_safe_role_internalization.md) |
 | 14 | [Jailbreaking Jailbreaks (ProAct)](https://aclanthology.org/2026.findings-emnlp.516/) | 2026 | Return spurious "compliance" to poison iterative attacker search. | [`14_proact_jailbreaking_jailbreaks.md`](14_proact_jailbreaking_jailbreaks.md) |
+
+### Additional Implemented Methods in `refusal-toolkit`
+
+| Paper | Year | One-line | Implementation in `refusal-toolkit` |
+|---|---|---|---|
+| [Is Abliteration Getting Harder? Not Uniformly (Heretic 2.0)](https://arxiv.org/abs/2611.17846) | 2026 | TPE search over `dim`, `mpoa`, `som`, `ara`, `jspace` with first-token KL cap. | `src/ablate.py`, `scripts/10_heretic_search.py`, `scripts/11_evaluate_capability.py`, `configs/model_pairs.yaml` |
+| [The Refusal Direction is Universal](https://arxiv.org/abs/2506.16754) (Wang et al.) | 2025 | English refusal direction transfers across 14+ languages. | `scripts/05_cross_lingual.py`, `data/multilingual-*.txt` |
+| [LLMs Encode Harmfulness and Refusal in Separable Subspaces](https://arxiv.org/abs/2506.16728) (Zhao et al.) | 2025 | Orthogonalize harmfulness direction from refusal direction; latent guard. | `scripts/06_harmfulness_guard.py`, `src/directions.py`, `src/evaluate.py` |
+| [Willing but Unable / SOMs Generalize DiM](https://arxiv.org/abs/2507.04550) (Piras et al.) | 2025 | Top-k SVD and 1-D Self-Organizing Map (SOM) directions. | `src/directions.py`, `src/ablate.py` |
+| [Sparse Autoencoders for Refusal](https://arxiv.org/abs/2507.02646) (Hawasly et al.) | 2026 | Top-k JumpReLU SAE isolates sparse refusal features. | `src/sae_extract.py`, `scripts/08_sae_refusal.py` |
+| [Refusal in Code LLMs](https://huggingface.co/blog/monsoon-nlp/refusal-in-code-llms) (Liguori et al.) | 2025 | Abliterating code LLMs removes CWE-injection refusals. | `scripts/07_codeql_verify.py`, `data/cwe-*.txt` |
+| [WildGuard Moderation Judge](https://arxiv.org/abs/2406.08495) (Han et al.) | 2024 | Open one-stop safety/jailbreak/refusal classifier. | `src/evaluate.py` (`wildguard_judge_*`) |
+| [LEACE: Perfect Linear Concept Erasure](https://arxiv.org/abs/2306.03819) (Belrose et al.) | 2024 | Closed-form whitening direction $C^{-1/2}\delta$. | `src/ablate.py::leace_direction` |
 
 > Note on `09` ↔ `12`: arXiv:2606.04778 is a single paper covering both an **attack**
 > (mid-sequence injection, row 9) and its **defense** (trajectory alignment, row 12).

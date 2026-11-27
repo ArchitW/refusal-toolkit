@@ -17,6 +17,10 @@ def main():
     parser.add_argument("--harmful")
     parser.add_argument("--harmless")
     parser.add_argument("--output")
+    parser.add_argument("--judge", choices=["regex", "logprob", "hybrid"], default="regex",
+                        help="Refusal judge mode (Paper 07: logprob/hybrid)")
+    parser.add_argument("--refusal-threshold", type=float, default=0.5,
+                        help="Refusal probability threshold for logprob judge")
     parser.add_argument("--repetition-penalty", type=float, default=1.0,
                         help="OBLITERATUS ships 1.15: without it greedy decoding loops on ablated models")
     args = parser.parse_args()
@@ -29,21 +33,31 @@ def main():
     )
     tokenizer = AutoTokenizer.from_pretrained(args.model)
 
-    results = {}
+    results = {"judge": args.judge, "refusal_threshold": args.refusal_threshold}
 
     if args.harmful:
         prompts = load_prompts(args.harmful)
-        print(f"Evaluating {len(prompts)} harmful prompts...")
+        print(f"Evaluating {len(prompts)} harmful prompts (judge={args.judge})...")
         results["harmful"] = evaluate_refusal_rate(
-            model, tokenizer, prompts, repetition_penalty=args.repetition_penalty
+            model,
+            tokenizer,
+            prompts,
+            repetition_penalty=args.repetition_penalty,
+            judge=args.judge,
+            refusal_threshold=args.refusal_threshold,
         )
         print(f"Refusal rate: {results['harmful']['refusal_rate']:.2%}")
 
     if args.harmless:
         prompts = load_prompts(args.harmless)
-        print(f"Evaluating {len(prompts)} harmless prompts...")
+        print(f"Evaluating {len(prompts)} harmless prompts (judge={args.judge})...")
         results["harmless"] = evaluate_harmless_compliance(
-            model, tokenizer, prompts, repetition_penalty=args.repetition_penalty
+            model,
+            tokenizer,
+            prompts,
+            repetition_penalty=args.repetition_penalty,
+            judge=args.judge,
+            refusal_threshold=args.refusal_threshold,
         )
         print(f"Over-refusal rate: {results['harmless']['over_refusal_rate']:.2%}")
 
